@@ -19,10 +19,6 @@ class DashboardProvider extends ChangeNotifier {
     await _scroll(context);
   }
 
-
-
-
-
   Future<void> scrollToHome() async {
     final context = homeKey.currentContext;
     await _scroll(context);
@@ -30,15 +26,11 @@ class DashboardProvider extends ChangeNotifier {
 
   Future _scroll(BuildContext? context) async {
     if (context != null) {
-      await Scrollable.ensureVisible(
-        context,
-        duration: const Duration(seconds: 1),
-        curve: Curves.linear,
-      );
+      await Scrollable.ensureVisible(context, duration: const Duration(seconds: 1), curve: Curves.linear);
     }
   }
 
-  scrollBasedOnHeader(NameOnTap nameOnTap) {
+  void scrollBasedOnHeader(NameOnTap nameOnTap) {
     if (nameOnTap.title == "Contact") {
       scrollToContact();
     } else if (nameOnTap.title == "Home") {

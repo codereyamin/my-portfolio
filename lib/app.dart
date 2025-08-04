@@ -5,18 +5,16 @@ import 'package:my_portfolio/provider/theme.dart';
 import 'package:my_portfolio/routes/routes.dart';
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, _) {
         return ThemeProvider(
-          initTheme: ref.watch(themeProvider).isDarkMode
-              ? MyThemes.darkTheme
-              : MyThemes.lightTheme,
+          initTheme: ref.watch(themeProvider).isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme,
           child: MaterialApp(
-            title: "Tuhin Ikbal Eyamin",
+            title: "CoderEyamin",
             debugShowCheckedModeBanner: false,
             themeMode: ref.watch(themeProvider).themeMode,
             theme: MyThemes.lightTheme,

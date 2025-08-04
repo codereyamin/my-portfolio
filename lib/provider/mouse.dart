@@ -6,18 +6,18 @@ final mouseProvider = ChangeNotifierProvider(((ref) => MouseProvider()));
 class MouseProvider extends ChangeNotifier {
   int _pressedAttentionIndex = -1;
 
-  bool ishovered(int index) {
+  bool isHovered(int index) {
     final pressAttention = _pressedAttentionIndex == index;
     return pressAttention;
   }
 
-  int setashovered(int index) {
+  int setAsHovered(int index) {
     _pressedAttentionIndex = index;
     notifyListeners();
     return _pressedAttentionIndex;
   }
 
-  int setasnothovered() {
+  int setAsNotHovered() {
     _pressedAttentionIndex = -1;
     notifyListeners();
     return _pressedAttentionIndex;

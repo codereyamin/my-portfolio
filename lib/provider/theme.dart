@@ -9,8 +9,7 @@ class CustomThemeProvider extends ChangeNotifier {
 
   bool get isDarkMode => themeMode == ThemeMode.dark;
 
-  ThemeData get getCurrentTheme =>
-      isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme;
+  ThemeData get getCurrentTheme => isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme;
 
   void changeTheme(bool? val) {
     if (val != null) {
@@ -27,18 +26,14 @@ class MyThemes {
     primaryColor: const Color(0xFFFFD800),
     iconTheme: const IconThemeData(color: kPrimaryColor),
     primarySwatch: Colors.yellow,
-    textButtonTheme: TextButtonThemeData(
-        style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.all(kBackgroundColor))),
+    textButtonTheme: TextButtonThemeData(style: ButtonStyle(foregroundColor: WidgetStatePropertyAll(kBackgroundColor))),
   );
   static final darkTheme = ThemeData(
-      scaffoldBackgroundColor: const Color.fromRGBO(7, 17, 26, 1),
-      colorScheme: const ColorScheme.dark(),
-      primarySwatch: Colors.yellow,
-      primaryColor: const Color(0xFFFFD800),
-      iconTheme: IconThemeData(color: Colors.grey[400]),
-      textButtonTheme: TextButtonThemeData(
-          style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.all(Colors.white),
-      )));
+    scaffoldBackgroundColor: const Color.fromRGBO(7, 17, 26, 1),
+    colorScheme: const ColorScheme.dark(),
+    primarySwatch: Colors.yellow,
+    primaryColor: const Color(0xFFFFD800),
+    iconTheme: IconThemeData(color: Colors.grey[400]),
+    textButtonTheme: TextButtonThemeData(style: ButtonStyle(foregroundColor: WidgetStatePropertyAll(Colors.white))),
+  );
 }

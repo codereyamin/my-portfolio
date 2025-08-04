@@ -9,8 +9,7 @@ import 'package:my_portfolio/provider/theme.dart';
 import 'package:my_portfolio/utils/globals.dart';
 import 'package:my_portfolio/utils/screen_helper.dart';
 import 'package:my_portfolio/widgets/switch.dart';
-import 'package:responsive_framework/responsive_value.dart';
-import 'package:responsive_framework/responsive_wrapper.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 import '../models/footer_item.dart';
 import '../models/header_item.dart';
@@ -31,26 +30,43 @@ part 'components/_footer.dart';
 part 'components/_header.dart';
 
 class Dashboard extends ConsumerStatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
+  const Dashboard({super.key});
 
   @override
   ConsumerState<Dashboard> createState() => _DashboardState();
 }
 
-class _DashboardState extends ConsumerState<Dashboard>
-    with SingleTickerProviderStateMixin {
-  late DashboardProvider _dashboardprovider;
-  final ScrollController scrollController = ScrollController();
+class _DashboardState extends ConsumerState<Dashboard> with SingleTickerProviderStateMixin {
+  late DashboardProvider dashBoardProvider;
+  ScrollController scrollController = ScrollController();
+
+  void onAppInitial() {
+    try {
+      dashBoardProvider = ref.read(dashboardProvider);
+      scrollController = ScrollController();
+    } catch (e) {
+      debugPrint("error on onAppInitial: $e");
+    }
+  }
+
+  void onAppClose() {
+    try {
+      scrollController.dispose();
+    } catch (e) {
+      debugPrint("error on onAppClose: $e");
+    }
+  }
 
   @override
   void initState() {
-    _dashboardprovider = ref.read(dashboardProvider);
     super.initState();
+    onAppInitial();
   }
 
   @override
   void dispose() {
     super.dispose();
+    onAppClose();
   }
 
   Widget _buildView() {
@@ -63,72 +79,45 @@ class _DashboardState extends ConsumerState<Dashboard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: ScreenHelper.isDesktop(context) ? 30 : 20,
-                ),
-                _HomeView(
-                  key: _dashboardprovider.homeKey,
-                ),
-                const SizedBox(
-                  height: 20.0,
-                ),
-                SizedBox(
-                  key: _dashboardprovider.portfolioKey,
-                  height: 100.0,
-                ),
+                SizedBox(height: ScreenHelper.isDesktop(context) ? 30 : 20),
+                _HomeView(key: dashBoardProvider.homeKey),
+                const SizedBox(height: 20.0),
+                SizedBox(key: dashBoardProvider.portfolioKey, height: 100.0),
                 Center(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Portfolio",
-                      style: GoogleFonts.josefinSans(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 36,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Portfolio of some relevant projects:",
-                      style: GoogleFonts.josefinSans(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    )
-                  ],
-                )),
-                _ProjectView(projects: ProjectModel.projects),
-                const SizedBox(
-                  height: 50.0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text("Portfolio", style: GoogleFonts.josefinSans(fontWeight: FontWeight.w900, fontSize: 36)),
+                      const SizedBox(height: 5),
+                      Text("Portfolio of some relevant projects:", style: GoogleFonts.josefinSans(color: Colors.grey[400], fontSize: 14)),
+                      const SizedBox(height: 15),
+                    ],
+                  ),
                 ),
-                _Footer(
-                  key: _dashboardprovider.contactKey,
-                )
+                _ProjectView(projects: ProjectModel.projects),
+                const SizedBox(height: 50.0),
+                _Footer(key: dashBoardProvider.contactKey),
               ],
             ),
           ),
         ),
         Header(
           themeSwitch: ThemeSwitcher(
-              clipper: const ThemeSwitcherBoxClipper(),
-              builder: (context) {
-                return CustomSwitch(
-                  value: ref.watch(themeProvider).isDarkMode,
-                  onChanged: (val) {
-                    ref.read(themeProvider).changeTheme(val);
-                    ThemeSwitcher.of(context).changeTheme(
-                        theme: ref.read(themeProvider).getCurrentTheme,
-                        isReversed: true // default: false
-                        );
-                  },
-                );
-              }),
+            clipper: const ThemeSwitcherBoxClipper(),
+            builder: (context) {
+              return CustomSwitch(
+                value: ref.watch(themeProvider).isDarkMode,
+                onChanged: (val) {
+                  ref.read(themeProvider).changeTheme(val);
+                  ThemeSwitcher.of(context).changeTheme(
+                    theme: ref.read(themeProvider).getCurrentTheme,
+                    isReversed: true, // default: false
+                  );
+                },
+              );
+            },
+          ),
         ),
       ],
     );
@@ -142,10 +131,7 @@ class _DashboardState extends ConsumerState<Dashboard>
         endDrawer: Drawer(
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 24.0,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
               child: ListView.separated(
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
@@ -153,43 +139,33 @@ class _DashboardState extends ConsumerState<Dashboard>
                       if (Globals.scaffoldKey.currentState != null) {
                         if (Globals.scaffoldKey.currentState!.isEndDrawerOpen) {
                           Navigator.pop(context);
-                          _dashboardprovider.scrollBasedOnHeader(
-                              HeaderRow.headerItems[index]);
+                          dashBoardProvider.scrollBasedOnHeader(HeaderRow.headerItems[index]);
                         }
                       }
                     },
-                    leading: Icon(
-                      HeaderRow.headerItems[index].iconData,
-                    ),
-                    title: Text(
-                      HeaderRow.headerItems[index].title,
-                      style: const TextStyle(),
-                    ),
+                    leading: Icon(HeaderRow.headerItems[index].iconData),
+                    title: Text(HeaderRow.headerItems[index].title, style: const TextStyle()),
                     trailing: HeaderRow.headerItems[index].isDarkTheme != null
                         ? HeaderRow.headerItems[index].isDarkTheme!
-                            ? SizedBox(
-                                width: 50,
-                                child: CustomSwitch(
-                                  value: ref.watch(themeProvider).isDarkMode,
-                                  onChanged: (val) {
-                                    ref.read(themeProvider).changeTheme(val);
-                                    ThemeSwitcher.of(context).changeTheme(
-                                        theme: ref
-                                            .read(themeProvider)
-                                            .getCurrentTheme,
-                                        isReversed: true // default: false
-                                        );
-                                  },
-                                ),
-                              )
-                            : null
+                              ? SizedBox(
+                                  width: 50,
+                                  child: CustomSwitch(
+                                    value: ref.watch(themeProvider).isDarkMode,
+                                    onChanged: (val) {
+                                      ref.read(themeProvider).changeTheme(val);
+                                      ThemeSwitcher.of(context).changeTheme(
+                                        theme: ref.read(themeProvider).getCurrentTheme,
+                                        isReversed: true, // default: false
+                                      );
+                                    },
+                                  ),
+                                )
+                              : null
                         : null,
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(
-                    height: 10.0,
-                  );
+                  return const SizedBox(height: 10.0);
                 },
                 itemCount: HeaderRow.headerItems.length,
               ),
